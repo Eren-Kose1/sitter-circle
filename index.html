@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SitterCircle: babysitters your circle actually trusts</title>
+  <meta name="description" content="Find a babysitter on short notice from people you or your friends have actually vetted, or swap childcare hours with other parents.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%230f766e' stroke-width='4'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23e76f51'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="4" />
+          <circle cx="16" cy="16" r="5" class="brand-dot" />
+        </svg>
+        <div>
+          <p class="brand-name">SitterCircle</p>
+          <p class="brand-tagline">Babysitters your circle actually trusts</p>
+        </div>
+      </div>
+      <p class="balance-pill">Swap balance: <strong id="header-balance">0 h</strong></p>
+    </div>
+
+    <nav class="wrap tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-find" aria-controls="panel-find" aria-selected="true">Find a sitter</button>
+      <button class="tab" role="tab" id="tab-circle" aria-controls="panel-circle" aria-selected="false" tabindex="-1">My circle</button>
+      <button class="tab" role="tab" id="tab-swap" aria-controls="panel-swap" aria-selected="false" tabindex="-1">Swap hours</button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap">
+    <!-- Find a sitter -->
+    <section id="panel-find" class="panel" role="tabpanel" aria-labelledby="tab-find">
+      <div id="upcoming"></div>
+
+      <form id="request-form" class="card" novalidate>
+        <h1>When do you need someone?</h1>
+
+        <fieldset class="group">
+          <legend>Day</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="when" value="tonight" checked> Tonight</label>
+            <label class="chip"><input type="radio" name="when" value="tomorrow"> Tomorrow</label>
+            <label class="chip"><input type="radio" name="when" value="other"> Another day</label>
+          </div>
+        </fieldset>
+
+        <div class="field-row">
+          <label class="field" id="date-field" hidden>
+            <span>Date</span>
+            <input type="date" name="date">
+          </label>
+          <label class="field">
+            <span>From</span>
+            <input type="time" name="from" value="19:00" required>
+          </label>
+          <label class="field">
+            <span>Until</span>
+            <input type="time" name="to" value="23:00" required>
+          </label>
+        </div>
+
+        <fieldset class="group">
+          <legend>Who needs looking after?</legend>
+          <div id="kid-options" class="chips"></div>
+        </fieldset>
+
+        <label class="field">
+          <span>Anything the sitter should know? <span class="optional">(optional)</span></span>
+          <textarea name="note" rows="2" placeholder="e.g. Noah has a nut allergy, bedtime is 20:00"></textarea>
+        </label>
+
+        <p class="form-error" id="form-error" role="alert"></p>
+        <button class="btn btn-primary" type="submit">Show who can come</button>
+      </form>
+
+      <div id="results"></div>
+    </section>
+
+    <!-- My circle -->
+    <section id="panel-circle" class="panel" role="tabpanel" aria-labelledby="tab-circle" hidden>
+      <div class="card intro">
+        <h1>Your circle</h1>
+        <p>Everyone here is sorted by how well <em>you</em> know them, not by star ratings from strangers.</p>
+        <dl class="trust-legend">
+          <div><dt><span class="tier-dot tier-used"></span>Have looked after your kids</dt><dd>You've used them before.</dd></div>
+          <div><dt><span class="tier-dot tier-vouched"></span>Vouched for by your circle</dt><dd>Parents you trust have used them.</dd></div>
+          <div><dt><span class="tier-dot tier-verified"></span>Verified only</dt><dd>ID checked, but nobody you know has used them yet.</dd></div>
+        </dl>
+      </div>
+      <div id="circle-list"></div>
+    </section>
+
+    <!-- Swap hours -->
+    <section id="panel-swap" class="panel" role="tabpanel" aria-labelledby="tab-swap" hidden>
+      <div class="card intro swap-summary">
+        <div>
+          <h1>Swap hours</h1>
+          <p>Look after another family's kids and earn hours. Spend them when a swap parent looks after yours. No money involved.</p>
+        </div>
+        <p class="balance-big"><span id="swap-balance">0</span><small>hours in the bank</small></p>
+      </div>
+
+      <form id="log-form" class="card" novalidate>
+        <h2>Log hours you sat</h2>
+        <div class="field-row">
+          <label class="field">
+            <span>Family</span>
+            <select name="family" id="log-family"></select>
+          </label>
+          <label class="field">
+            <span>Date</span>
+            <input type="date" name="date" required>
+          </label>
+          <label class="field">
+            <span>Hours</span>
+            <input type="number" name="hours" min="0.5" max="12" step="0.5" value="2" required>
+          </label>
+        </div>
+        <p class="form-error" id="log-error" role="alert"></p>
+        <button class="btn btn-primary" type="submit">Add hours</button>
+      </form>
+
+      <div class="card">
+        <h2>History</h2>
+        <ul id="ledger" class="ledger"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer">
+    <p>Prototype for a university design course. All people are fictional and their replies are simulated.</p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
